@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RolesModule } from './roles/roles.module';
 import { ExpertiseAreasModule } from './expertise-areas/expertise-areas.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { ExpertiseAreasModule } from './expertise-areas/expertise-areas.module';
       })
     }),
     RolesModule,
-    ExpertiseAreasModule
+    ExpertiseAreasModule,
+    ProjectsModule
   ],
   controllers: [AppController],
   providers: [AppService],
