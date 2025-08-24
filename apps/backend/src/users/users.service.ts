@@ -56,6 +56,9 @@ export class UsersService {
           email: email,
         },
       },
+      relations: {
+        userRole: true,
+      },
     });
   }
 
