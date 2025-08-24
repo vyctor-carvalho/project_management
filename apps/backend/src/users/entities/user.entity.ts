@@ -30,4 +30,8 @@ export class User {
     @JoinColumn({ name: 'role_id' })
     userRole: Role
 
+    @Column({ name: 'current_hashed_refresh_token', type: 'varchar', nullable: true })
+    currentHashedRefreshToken?: string;
+
+
 }

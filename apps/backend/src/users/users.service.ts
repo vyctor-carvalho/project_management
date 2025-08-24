@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Any, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { RolesService } from 'src/roles/roles.service';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity.js';
 
@@ -76,7 +76,9 @@ export class UsersService {
     });
   }
 
-  // Eu decidir comentar esse método porque achei que ele ficou um pouco mais difícil de se entender de primeira 
+  /**
+   * Eu decidir comentar esse método porque achei que ele ficou um pouco mais difícil de se entender de primeira 
+   */
   async update(id: string, updateUserDto: UpdateUserDto) {
     // Garantimos que o usuário que vamos editar existe
     const user = await this.usersRepository.findOneBy({ id });
@@ -84,7 +86,9 @@ export class UsersService {
       throw new NotFoundException(`User with ID "${id}" not found.`);
     }
 
-    // Se um novo email foi enviado, checamos se ele já pertence a outro usuário
+    /**
+     * Se um novo email foi enviado, checamos se ele já pertence a outro usuário 
+     */
     if (updateUserDto.authLogin?.email) {
       const emailOwner = await this.findOneByEmail(updateUserDto.authLogin.email);
       if (emailOwner && emailOwner.id !== id) {
@@ -94,7 +98,9 @@ export class UsersService {
       }
     }
 
-    // Construímos um objeto apenas com os dados que serão atualizados no banco
+    /**
+     * Construímos um objeto apenas com os dados que serão atualizados no banco
+     */
     const { roleId, authLogin, ...otherData } = updateUserDto;
     const partialEntity: QueryDeepPartialEntity<User> = {
       ...otherData, // Adiciona campos simples como name, birthDate, etc.
@@ -120,7 +126,9 @@ export class UsersService {
     
     partialEntity.updatedAt = new Date();
 
-    // Agora que os dados estão prontos e validados, aplicamos a atualização
+    /**
+     * Agora que os dados estão prontos e validados, aplicamos a atualização
+     */ 
     await this.usersRepository.update(id, partialEntity);
 
 
@@ -129,5 +137,54 @@ export class UsersService {
 
   remove(id: string) {
     return this.usersRepository.delete(id);
+  }
+
+  /**
+   * Hasheia e salva o refresh token para um usuário específico.
+   * Chamado durante o login bem-sucedido.
+   */
+  async setCurrentRefreshToken(refreshToken: string, userId: string): Promise<void> {
+    // Gera o hash do token
+    const hashedRefreshToken = await hash(refreshToken, 10);
+
+    // Atualiza o usuário no banco com o novo hash
+    await this.usersRepository.update(userId, {
+      currentHashedRefreshToken: hashedRefreshToken,
+    });
+  }
+
+  /**
+   * Busca um usuário e verifica se o refresh token fornecido corresponde ao hash salvo.
+   * Usado pela JwtRefreshStrategy para validar o token.
+   */
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: string): Promise<User | null> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+
+    // Garante que o usuário e o hash existem
+    if (!user || !user.currentHashedRefreshToken) {
+      return null;
+    }
+
+    // Compara o token recebido com o hash salvo no banco
+    const isRefreshTokenMatching = await compare(
+      refreshToken,
+      user.currentHashedRefreshToken,
+    );
+
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+
+    return null;
+  }
+  
+  /**
+   * Remove o refresh token de um usuário.
+   * Chamado durante o logout.
+   */
+  async removeRefreshToken(userId: string): Promise<any> {
+    return this.usersRepository.update(userId, {
+      currentHashedRefreshToken: undefined,
+    });
   }
 }

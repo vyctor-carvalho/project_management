@@ -17,6 +17,7 @@ import { AuthLoginModule } from './auth-login/auth-login.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],  
+      
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.get('DATABASE_URL'),
@@ -28,7 +29,7 @@ import { AuthLoginModule } from './auth-login/auth-login.module';
     ExpertiseAreasModule,
     ProjectsModule,
     UsersModule,
-    AuthLoginModule
+    AuthLoginModule,
   ],
   controllers: [AppController],
   providers: [AppService],
