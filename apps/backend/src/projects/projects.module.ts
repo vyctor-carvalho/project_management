@@ -10,5 +10,6 @@ import { Project } from './entities/project.entity';
   ],
   controllers: [ProjectsController],
   providers: [ProjectsService],
+  exports: [ProjectsService],
 })
 export class ProjectsModule {}

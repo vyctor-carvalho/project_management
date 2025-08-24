@@ -10,5 +10,6 @@ import { ExpertiseArea } from './entities/expertise-area.entity';
   ],
   controllers: [ExpertiseAreasController],
   providers: [ExpertiseAreasService],
+  exports: [ExpertiseAreasService],
 })
 export class ExpertiseAreasModule {}

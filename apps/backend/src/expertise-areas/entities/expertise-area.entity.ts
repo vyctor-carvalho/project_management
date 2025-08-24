@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Task } from "src/tasks/entities/task.entity";
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "expertise_areas" })
 export class ExpertiseArea {
@@ -7,4 +8,8 @@ export class ExpertiseArea {
 
     @Column({ type: 'varchar', length: 50, unique: true })
     name: string;
+
+    @OneToMany(() => Task, (task) => task.expertiseArea)
+    @JoinColumn({ name: 'task_id' })
+    tasks: Task[];
 }

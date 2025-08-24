@@ -8,6 +8,7 @@ import { ExpertiseAreasModule } from './expertise-areas/expertise-areas.module';
 import { ProjectsModule } from './projects/projects.module';
 import { UsersModule } from './users/users.module';
 import { AuthLoginModule } from './auth-login/auth-login.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AuthLoginModule } from './auth-login/auth-login.module';
     ProjectsModule,
     UsersModule,
     AuthLoginModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { AuthLogin } from "../../auth-login/entities/auth-login.entity";
 import { EmploymentType } from "../enums/employment-type.enum";
 import { Role } from "src/roles/entities/role.entity";
+import { Task } from "src/tasks/entities/task.entity";
 
 @Entity({ name: "users" })
 export class User {
@@ -33,5 +34,8 @@ export class User {
     @Column({ name: 'current_hashed_refresh_token', type: 'varchar', nullable: true })
     currentHashedRefreshToken?: string;
 
+    @OneToMany(() => Task, (task) => task.user)
+    @JoinColumn({ name: 'task_id' })
+    tasks: Task[];
 
 }
