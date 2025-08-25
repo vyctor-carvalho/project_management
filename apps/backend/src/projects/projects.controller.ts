@@ -22,6 +22,11 @@ export class ProjectsController {
     return this.projectsService.findOne(id);
   }
 
+  @Get(':id/teams')
+  findProjectTeams(@Param('id') id: string) {
+    return this.projectsService.findProjectTeams(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
     return this.projectsService.update(id, updateProjectDto);

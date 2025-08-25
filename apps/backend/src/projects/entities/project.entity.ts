@@ -1,3 +1,4 @@
+import { ProjectMember } from "src/project_members/entities/project_member.entity";
 import { Task } from "src/tasks/entities/task.entity";
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -28,4 +29,7 @@ export class Project {
     @OneToMany(() => Task, (task) => task.project)
     @JoinColumn({ name: 'task_id' })
     tasks: Task[];
+
+    @OneToMany(() => ProjectMember, (projectMember) => projectMember.project)
+    members: ProjectMember[];
 }

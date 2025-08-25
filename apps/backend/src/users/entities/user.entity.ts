@@ -3,6 +3,8 @@ import { AuthLogin } from "../../auth-login/entities/auth-login.entity";
 import { EmploymentType } from "../enums/employment-type.enum";
 import { Role } from "src/roles/entities/role.entity";
 import { Task } from "src/tasks/entities/task.entity";
+import { UserExpertiseArea } from "src/user_expertise_areas/entities/user_expertise_area.entity";
+import { ProjectMember } from "src/project_members/entities/project_member.entity";
 
 @Entity({ name: "users" })
 export class User {
@@ -37,5 +39,11 @@ export class User {
     @OneToMany(() => Task, (task) => task.user)
     @JoinColumn({ name: 'task_id' })
     tasks: Task[];
+
+    @OneToMany(() => UserExpertiseArea, (userExpertiseArea) => userExpertiseArea.user)
+    expertiseAreas: UserExpertiseArea[];
+
+    @OneToMany(() => ProjectMember, (projectMember) => projectMember.member)
+    projects: ProjectMember[];
 
 }

@@ -22,6 +22,11 @@ export class ExpertiseAreasController {
     return this.expertiseAreasService.findOne(id);
   }
 
+  @Get(':id/members')
+  findMembersByArea(@Param('id') id: string) {
+    return this.expertiseAreasService.findMembersByArea(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateExpertiseAreaDto: UpdateExpertiseAreaDto) {
     return this.expertiseAreasService.update(id, updateExpertiseAreaDto);
