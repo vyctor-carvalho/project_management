@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthLoginService } from './auth-login.service';
 import { CreateAuthLoginDto } from './dto/create-auth-login.dto';
 import { UpdateAuthLoginDto } from './dto/update-auth-login.dto';
@@ -26,5 +26,4 @@ export class AuthLoginController {
   async logout(@Request() req) {
     return this.authLoginService.logout(req.user.id);
   }
-
 }

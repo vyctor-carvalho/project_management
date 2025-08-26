@@ -1,9 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserExpertiseAreasService } from './user_expertise_areas.service';
 import { CreateUserExpertiseAreaDto } from './dto/create-user_expertise_area.dto';
 import { UpdateUserExpertiseAreaDto } from './dto/update-user_expertise_area.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/auth-login/guards/roles.guard';
+import { Roles } from 'src/auth-login/decorators/roles.decorator';
 
 @Controller('user-expertise-areas')
+@UseGuards(AuthGuard('jwt'), RolesGuard) 
+@Roles('Admin', 'Manager')
 export class UserExpertiseAreasController {
   constructor(private readonly userExpertiseAreasService: UserExpertiseAreasService) {}
 
