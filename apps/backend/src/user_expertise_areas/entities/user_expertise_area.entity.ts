@@ -1,5 +1,5 @@
-import { ExpertiseArea } from "src/expertise-areas/entities/expertise-area.entity";
-import { User } from "src/users/entities/user.entity";
+import { ExpertiseArea } from "../../expertise-areas/entities/expertise-area.entity";
+import { User } from "../../users/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "user_expertise_areas" })

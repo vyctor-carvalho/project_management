@@ -1,5 +1,5 @@
-import { ProjectMember } from "src/project_members/entities/project_member.entity";
-import { Task } from "src/tasks/entities/task.entity";
+import { ProjectMember } from "../../project_members/entities/project_member.entity";
+import { Task } from "../../tasks/entities/task.entity";
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 

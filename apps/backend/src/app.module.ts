@@ -11,23 +11,14 @@ import { AuthLoginModule } from './auth-login/auth-login.module';
 import { TasksModule } from './tasks/tasks.module';
 import { ProjectMembersModule } from './project_members/project_members.module';
 import { UserExpertiseAreasModule } from './user_expertise_areas/user_expertise_areas.module';
+import { dataSourceOptions } from './database/data-source';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],  
-      
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.get('DATABASE_URL'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-      })
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     RolesModule,
     ExpertiseAreasModule,
     ProjectsModule,

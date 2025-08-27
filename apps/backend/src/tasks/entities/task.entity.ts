@@ -2,9 +2,9 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
 import { TaskStatus } from "../enums/tasks-status.enum";
 import { TaskPriority } from "../enums/task-priority.enum";
 import { Type } from "class-transformer";
-import { Project } from "src/projects/entities/project.entity";
-import { User } from "src/users/entities/user.entity";
-import { ExpertiseArea } from "src/expertise-areas/entities/expertise-area.entity";
+import { Project } from "../../projects/entities/project.entity";
+import { User } from "../../users/entities/user.entity";
+import { ExpertiseArea } from "../../expertise-areas/entities/expertise-area.entity";
 
 @Entity()
 export class Task {
