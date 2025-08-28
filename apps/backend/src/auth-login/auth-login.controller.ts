@@ -11,6 +11,7 @@ export class AuthLoginController {
   @UseGuards(AuthGuard('local'))  
   @Post("login")
   async login(@Body() createAuthLoginDto: CreateAuthLoginDto) {
+    console.log(createAuthLoginDto)
     const user = await this.authLoginService.validateUser(createAuthLoginDto.email, createAuthLoginDto.password);
     return this.authLoginService.login(user);
   }
