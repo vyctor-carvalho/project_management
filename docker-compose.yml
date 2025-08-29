@@ -1,58 +1,54 @@
 version: '3.8'
 
 services:
-  # Frontend Next.js Application
+  # --- Serviço do Frontend ---
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: . # O contexto é a raiz do monorepo, para que o Dockerfile possa aceder a tudo.
+      dockerfile: ./apps/frontend/Dockerfile # Caminho para o Dockerfile do frontend.
     ports:
       - "3000:3000"
+    # A variável de ambiente é passada para que o frontend saiba onde está o backend DENTRO da rede Docker.
     environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://localhost:3001/
-    volumes:
-      # Mount source code for development (comment out for production)
-      - .:/app
-      - /app/node_modules
-      - /app/.next
+      - NEXT_PUBLIC_API_URL=http://backend:3001
     depends_on:
       - backend
     networks:
-      - app-network
+      - project-hub-network
 
-  # Backend API (placeholder - replace with your actual backend)
+  # --- Serviço do Backend ---
   backend:
-    # Replace this with your actual backend image or build context
-    image: node:18-alpine
+    build:
+      context: . # O contexto também é a raiz do monorepo.
+      dockerfile: ./apps/backend/Dockerfile # Caminho para o Dockerfile do backend.
     ports:
       - "3001:3001"
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
-    # Add your backend configuration here
-    command: ["sh", "-c", "echo 'Backend placeholder - replace with your actual backend service' && sleep infinity"]
+    # O ficheiro .env é passado para o container para configurar a base de dados e outros segredos.
+    env_file:
+      - ./apps/backend/.env
+    depends_on:
+      - db
     networks:
-      - app-network
+      - project-hub-network
 
-  # Database (example with PostgreSQL)
-  database:
+  # --- Serviço da Base de Dados ---
+  db:
     image: postgres:15-alpine
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_DB=projecthub
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5434:5432" # Mapeia a porta do container para a sua máquina local.
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data # Garante que os dados da base de dados persistem.
     networks:
-      - app-network
+      - project-hub-network
 
+# --- Volumes e Redes ---
 volumes:
   postgres_data:
 
 networks:
-  app-network:
+  project-hub-network:
     driver: bridge
-

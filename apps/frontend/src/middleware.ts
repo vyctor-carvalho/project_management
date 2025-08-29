@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
-  console.log(`o token nos cookeies ${token}`)
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
@@ -14,7 +13,6 @@ export function middleware(request: NextRequest) {
 
   // If user is not authenticated and trying to access a protected route
   if (!token && !isPublicRoute && pathname !== '/') {
-    console.log(token)
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-// Base API URL - should be configured via environment variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/';
 
 class ApiClient {
@@ -66,7 +65,7 @@ class ApiClient {
     this.refreshToken = refreshToken;
     
     if (typeof window !== 'undefined') {
-      console.log('Setting tokens in localStorage:', token, refreshToken);
+      console.log(`token=${token}  refresh=${refreshToken}`)
       localStorage.setItem('token', token);
       localStorage.setItem('refreshToken', refreshToken);
       document.cookie = `token=${token}; path=/;`;

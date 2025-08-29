@@ -5,8 +5,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
+  token: string;
+  refreshToken: string;
   user: User;
 }
 
@@ -76,7 +76,8 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  priority: 'Baixa' | 'Média' | 'Alta';
+  priority: 'Baixa' | 'Média' | 'Alta' | 'Urgente';
+  status: 'Pendente' | 'Fazendo' | 'Feito' | 'Arquivada';
   dueDate: string;
   projectId: string;
   assigneeId: string;
@@ -89,7 +90,7 @@ export interface Task {
 export interface CreateTaskRequest {
   title: string;
   description: string;
-  priority: 'Baixa' | 'Média' | 'Alta';
+  priority: 'Baixa' | 'Média' | 'Alta' | 'Urgente';
   dueDate: string;
   projectId: string;
   assigneeId: string;

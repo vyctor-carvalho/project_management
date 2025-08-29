@@ -1,61 +1,56 @@
-# Use the official Node.js 18 image as base
-FROM node:18-alpine AS base
+# apps/frontend/Dockerfile
 
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
+# --- Estágio 1: Builder ---
+# Este estágio instala todas as dependências (incluindo as de desenvolvimento)
+# e constrói a aplicação Next.js para produção.
+FROM node:20-alpine AS builder
+WORKDIR /usr/src/app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci
+# Instala o pnpm globalmente
+RUN npm install -g pnpm
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copia os ficheiros de configuração do monorepo
+COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY package.json ./
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED 1
+# Copia os ficheiros do frontend e dos pacotes partilhados
+COPY apps/frontend ./apps/frontend
+COPY packages ./packages
 
-# Build the application
-RUN npm run build
+# Instala todas as dependências (incluindo as de desenvolvimento para o build)
+RUN pnpm install --prod=false
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
+# Constrói a aplicação frontend para produção
+RUN pnpm --filter frontend build
+
+# --- Estágio 2: Runner ---
+# Este estágio cria a imagem final, leve e otimizada para produção.
+FROM node:20-alpine AS runner
+WORKDIR /usr/src/app
 
 ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Instala o pnpm globalmente
+RUN npm install -g pnpm
 
-COPY --from=builder /app/public ./public
+# Copia os ficheiros de configuração para instalar apenas as dependências de produção
+COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
+COPY package.json ./
+COPY apps/frontend/package.json ./apps/frontend/
+COPY packages ./packages
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# Instala apenas as dependências de produção
+RUN pnpm install --prod
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Copia os ficheiros construídos do estágio anterior
+COPY --from=builder /usr/src/app/apps/frontend/.next ./apps/frontend/.next
 
-USER nextjs
+# CORREÇÃO: Altera para copiar o ficheiro .mjs que existe no seu projeto
+COPY --from=builder /usr/src/app/apps/frontend/next.config.mjs ./apps/frontend/
 
 EXPOSE 3000
 
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"]
-
+# Comando para iniciar a aplicação Next.js em modo de produção
+CMD ["pnpm", "--filter", "frontend", "start"]

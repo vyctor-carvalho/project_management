@@ -7,11 +7,11 @@ export class AuthService {
       const response = await apiClient.post<LoginResponse>('/auth/login', credentials);
       
       // Store tokens in the API client
-      apiClient.setTokens(response.access_token, response.refresh_token);
+      apiClient.setTokens(response.token, response.refreshToken);
       
       return response;
-    } catch (error: any) {
-      console.error(error.response.data.message);
+    } catch (error) {
+      console.error('Login error:', error);
       throw new Error('Falha na autenticação. Verifique suas credenciais.');
     }
   }

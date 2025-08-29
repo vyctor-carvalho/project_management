@@ -2,22 +2,20 @@
 
 # --- Estágio 1: Builder ---
 # Este estágio foca em instalar todas as dependências
-# e compilar o código TypeScript para JavaScript
+# e compilar o código TypeScript para JavaScript.
 FROM node:20-alpine AS builder
 
-# Define o diretório de trabalho
 WORKDIR /usr/src/app
 
 # Instala o pnpm
 RUN npm install -g pnpm
 
-# Copia os arquivos de configuração do pnpm e o package.json da RAIZ do monorepo.
-# O Docker Compose vai executar a partir da raiz, então esses caminhos funcionam.
+# Copia os ficheiros de configuração do pnpm e o package.json da RAIZ do monorepo.
 COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml ./
 COPY package.json ./
 
-# Copia os arquivos específicos do backend e os pacotes compartilhados
+# Copia os ficheiros específicos do backend e os pacotes partilhados
 COPY apps/backend ./apps/backend
 COPY packages ./packages
 
@@ -35,25 +33,21 @@ FROM node:20-alpine AS runner
 
 WORKDIR /usr/src/app
 
-# Instala o pnpm
-RUN npm install -g pnpm
+ENV NODE_ENV production
 
-# Copia novamente os arquivos de configuração para que possamos instalar
-# apenas as dependências de produção.
-COPY pnpm-lock.yaml ./
-COPY pnpm-workspace.yaml ./
-COPY package.json ./
+# Copia o package.json do backend para referência
 COPY apps/backend/package.json ./apps/backend/
-COPY packages ./packages
 
-# Instala APENAS as dependências de produção, resultando em uma pasta node_modules menor
-RUN pnpm install --prod
+# --- CORREÇÃO PRINCIPAL ---
+# Copia a pasta node_modules completa do estágio 'builder'.
+# Isto é mais fiável do que reinstalar as dependências.
+COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 # Copia o código compilado (a pasta 'dist') do estágio 'builder'
 COPY --from=builder /usr/src/app/apps/backend/dist ./apps/backend/dist
 
 # Expõe a porta que a aplicação escuta
-EXPOSE 3000
+EXPOSE 3001
 
 # Comando para iniciar a aplicação
 CMD ["node", "apps/backend/dist/main"]
